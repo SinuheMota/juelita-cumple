@@ -16,6 +16,7 @@ import {
   SRGBColorSpace,
   Vector3,
 } from "three";
+import { assetUrl } from "../utils/assetUrl";
 
 type BirthdayCardProps = {
   id: string;
@@ -49,7 +50,7 @@ export function BirthdayCard({
 
   useCursor(isHovered || isActive, "pointer");
 
-  const texture = useTexture(image);
+  const texture = useTexture(assetUrl(image));
   useEffect(() => {
     texture.colorSpace = SRGBColorSpace;
     texture.anisotropy = 4;

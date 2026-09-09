@@ -5,6 +5,7 @@ import type { Group, Mesh, PointLight } from "three";
 import { DoubleSide, MathUtils, ShaderMaterial } from "three";
 import type { IUniform } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { assetUrl } from "../utils/assetUrl";
 
 type CandleProps = ThreeElements["group"] & {
   isLit?: boolean;
@@ -83,7 +84,7 @@ const fragmentShader = `
 `;
 
 export function Candle({ children, isLit = true, ...groupProps }: CandleProps) {
-  const gltf = useLoader(GLTFLoader, "/candle.glb");
+  const gltf = useLoader(GLTFLoader, assetUrl("/candle.glb"));
   const candleScene = useMemo<Group | null>(() => gltf.scene?.clone(true) ?? null, [gltf.scene]);
   const lightRef = useRef<PointLight>(null);
   const flameMeshRef = useRef<Mesh>(null);

@@ -6,6 +6,7 @@ import {
   DoubleSide,
   SRGBColorSpace,
 } from "three";
+import { assetUrl } from "../utils/assetUrl";
 
 type CakeProps = ThreeElements["group"];
 
@@ -20,7 +21,7 @@ const DUCK_COUNT = 10;
 const DRIP_COUNT = 16;
 const SHELL_COUNT = 40;
 const PEARL_COUNT = 10;
-const SCRIPT_FONT = "/fonts/Sacramento-Regular.woff";
+const SCRIPT_FONT = assetUrl("/fonts/Sacramento-Regular.woff");
 
 function createDuckTexture() {
   const size = 128;

@@ -2,6 +2,7 @@ import type { ThreeElements } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import { useEffect } from "react";
 import { DoubleSide, SRGBColorSpace } from "three";
+import { assetUrl } from "../utils/assetUrl";
 
 type LandscapeFrameProps = ThreeElements["group"] & {
   image: string;
@@ -21,7 +22,7 @@ export function LandscapeFrame({
   children,
   ...groupProps
 }: LandscapeFrameProps) {
-  const texture = useTexture(image);
+  const texture = useTexture(assetUrl(image));
 
   useEffect(() => {
     texture.colorSpace = SRGBColorSpace;

@@ -22,6 +22,7 @@ import { BirthdayCard } from "./components/BirthdayCard";
 import { MusicPlayer } from "./components/MusicPlayer";
 import { StarrySky } from "./components/StarrySky";
 import { Balloons } from "./components/Balloons";
+import { assetUrl } from "./utils/assetUrl";
 
 import "./App.css";
 
@@ -502,7 +503,7 @@ export default function App() {
       {hasAnimationCompleted && isCandleLit && (
         <div className="hint-overlay">presiona espacio para apagar la vela</div>
       )}
-      <MusicPlayer autoStart={hasStarted} src="/save-a-prayer-hq.mp3" />
+      <MusicPlayer autoStart={hasStarted} src={assetUrl("/save-a-prayer-hq.mp3")} />
       <Canvas
         gl={{ alpha: true }}
         style={{ background: "transparent" }}
