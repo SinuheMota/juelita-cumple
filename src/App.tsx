@@ -1,5 +1,5 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, OrbitControls } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import {
   Suspense,
   useCallback,
@@ -15,8 +15,13 @@ import { Candle } from "./models/candle";
 import { Cake } from "./models/cake";
 import { Table } from "./models/table";
 import { PictureFrame } from "./models/pictureFrame";
+import { LandscapeFrame } from "./models/landscapeFrame";
 import { Fireworks } from "./components/Fireworks";
+import { Confetti } from "./components/Confetti";
 import { BirthdayCard } from "./components/BirthdayCard";
+import { MusicPlayer } from "./components/MusicPlayer";
+import { StarrySky } from "./components/StarrySky";
+import { Balloons } from "./components/Balloons";
 
 import "./App.css";
 
@@ -77,11 +82,11 @@ const BACKGROUND_FADE_START = Math.max(
 );
 
 const TYPED_LINES = [
-  "> tina",
+  "> juelita",
   "...",
-  "> today is your birthday",
+  "> hoy es tu cumpleaños",
   "...",
-  "> so i made you this computer program",
+  "> así que te hice esto",
   "...",
   "٩(◕‿◕)۶ ٩(◕‿◕)۶ ٩(◕‿◕)۶"
 ];
@@ -283,12 +288,12 @@ function AnimatedScene({
           rotation={[0, 5.4, 0]}
           scale={0.75}
         />
-        <PictureFrame
+        <LandscapeFrame
           image="/frame1.jpg"
-          position={[-1.5, 0.735, -2.5]}
+          position={[-1.5, 0.735, -1.7]}
           rotation={[0, 4.2, 0]}
-          scale={0.75}
         />
+        <Balloons position={[1.55, 0, -0.85]} />
         {cards.map((card) => (
           <BirthdayCard
             key={card.id}
@@ -345,26 +350,6 @@ function ConfiguredOrbitControls() {
   );
 }
 
-type EnvironmentBackgroundControllerProps = {
-  intensity: number;
-};
-
-function EnvironmentBackgroundController({
-  intensity,
-}: EnvironmentBackgroundControllerProps) {
-  const scene = useThree((state) => state.scene);
-
-  useEffect(() => {
-    if ("backgroundIntensity" in scene) {
-      // Cast required because older typings might not include backgroundIntensity yet.
-      (scene as typeof scene & { backgroundIntensity: number }).backgroundIntensity =
-        intensity;
-    }
-  }, [scene, intensity]);
-
-  return null;
-}
-
 
 export default function App() {
   const [hasStarted, setHasStarted] = useState(false);
@@ -378,32 +363,6 @@ export default function App() {
   const [isCandleLit, setIsCandleLit] = useState(true);
   const [fireworksActive, setFireworksActive] = useState(false);
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
-  const backgroundAudioRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    const audio = new Audio("/music.mp3");
-    audio.loop = true;
-    audio.preload = "auto";
-    backgroundAudioRef.current = audio;
-    return () => {
-      audio.pause();
-      backgroundAudioRef.current = null;
-    };
-  }, []);
-
-  const playBackgroundMusic = useCallback(() => {
-    const audio = backgroundAudioRef.current;
-    if (!audio) {
-      return;
-    }
-    if (!audio.paused) {
-      return;
-    }
-    audio.currentTime = 0;
-    void audio.play().catch(() => {
-      // ignore play errors (browser might block)
-    });
-  }, []);
 
   const typingComplete = currentLineIndex >= TYPED_LINES.length;
   const typedLines = useMemo(() => {
@@ -493,7 +452,6 @@ export default function App() {
       }
       event.preventDefault();
       if (!hasStarted) {
-        playBackgroundMusic();
         setHasStarted(true);
         return;
       }
@@ -505,7 +463,7 @@ export default function App() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [hasStarted, hasAnimationCompleted, isCandleLit, playBackgroundMusic]);
+  }, [hasStarted, hasAnimationCompleted, isCandleLit]);
 
   const handleCardToggle = useCallback((id: string) => {
     setActiveCardId((current) => (current === id ? null : id));
@@ -537,10 +495,14 @@ export default function App() {
             );
           })}
         </div>
+        {!hasStarted && (
+          <div className="space-hint">presiona espacio para empezar</div>
+        )}
       </div>
       {hasAnimationCompleted && isCandleLit && (
-        <div className="hint-overlay">press space to blow out the candle</div>
+        <div className="hint-overlay">presiona espacio para apagar la vela</div>
       )}
+      <MusicPlayer autoStart={hasStarted} src="/save-a-prayer-hq.mp3" />
       <Canvas
         gl={{ alpha: true }}
         style={{ background: "transparent" }}
@@ -559,18 +521,12 @@ export default function App() {
             activeCardId={activeCardId}
             onToggleCard={handleCardToggle}
           />
-          <ambientLight intensity={(1 - environmentProgress) * 0.8} />
-          <directionalLight intensity={0.5} position={[2, 10, 0]} color={[1, 0.9, 0.95]}/>
-          <Environment
-            files={["/shanghai_bund_4k.hdr"]}
-            backgroundRotation={[0, 3.3, 0]}
-            environmentRotation={[0, 3.3, 0]}
-            background
-            environmentIntensity={0.1 * environmentProgress}
-            backgroundIntensity={0.05 * environmentProgress}
-          />
-          <EnvironmentBackgroundController intensity={0.05 * environmentProgress} />
+          <ambientLight intensity={0.4 + (1 - environmentProgress) * 0.6} />
+          <directionalLight intensity={0.8} position={[2, 10, 0]} color={[1, 0.9, 0.95]}/>
+          <pointLight intensity={0.6} position={[0, 3, 2]} color="#ffd9a0" distance={12} decay={2} />
+          <StarrySky progress={environmentProgress} />
           <Fireworks isActive={fireworksActive} origin={[0, 10, 0]} />
+          <Confetti isActive={fireworksActive} origin={[0, 2.6, 0]} />
           <ConfiguredOrbitControls />
         </Suspense>
       </Canvas>

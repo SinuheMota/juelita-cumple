@@ -168,7 +168,7 @@ export function Candle({ children, isLit = true, ...groupProps }: CandleProps) {
       <mesh ref={flameMeshRef} scale={0.4} position={[0, 2.9, 0]} material={flameMaterial}>
         <sphereGeometry args={[0.5, 32, 32]} />
       </mesh>
-      <pointLight ref={lightRef} distance={5} color="#ffffffff" decay={1} />
+      <pointLight ref={lightRef} distance={5} color="#ffffff" decay={1} />
       {children}
     </group>
   );

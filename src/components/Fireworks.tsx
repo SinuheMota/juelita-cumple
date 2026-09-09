@@ -1,6 +1,7 @@
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import {
+  AdditiveBlending,
   BufferAttribute,
   BufferGeometry,
   Color,
@@ -8,13 +9,14 @@ import {
   PointsMaterial,
   Vector3,
 } from "three";
+import { createGlowTexture } from "../utils/sprites";
 
 type FireworksProps = {
   isActive: boolean;
   origin?: [number, number, number];
 };
 
-const FIREWORK_COUNT = 100;
+const FIREWORK_COUNT = 65;
 const PARTICLES_PER_FIREWORK = 10;
 const TOTAL_PARTICLES = FIREWORK_COUNT * PARTICLES_PER_FIREWORK;
 const GRAVITY = -4;
@@ -40,6 +42,13 @@ export function Fireworks({ isActive, origin = [0, 5, -14] }: FireworksProps) {
   const materialRef = useRef<PointsMaterial>(null);
   const dataRef = useRef<FireworkData | null>(null);
   const baseOrigin = useMemo(() => new Vector3(...origin), [origin]);
+  const sparkTexture = useMemo(() => createGlowTexture(), []);
+
+  useEffect(() => {
+    return () => {
+      sparkTexture.dispose();
+    };
+  }, [sparkTexture]);
 
   if (!dataRef.current) {
     dataRef.current = {
@@ -67,7 +76,7 @@ export function Fireworks({ isActive, origin = [0, 5, -14] }: FireworksProps) {
     const baseIndex = index * 3;
     const burstOrigin = baseOrigin
       .clone()
-      .add(new Vector3((Math.random() - 0.5) * 1000, Math.random() * 200, (Math.random() - 0.5) * 1000));
+      .add(new Vector3((Math.random() - 0.5) * 4, Math.random() * 3, (Math.random() - 0.5) * 4));
 
     origins[baseIndex] = burstOrigin.x;
     origins[baseIndex + 1] = burstOrigin.y;
@@ -178,12 +187,14 @@ export function Fireworks({ isActive, origin = [0, 5, -14] }: FireworksProps) {
         </bufferGeometry>
         <pointsMaterial
           ref={materialRef}
-          size={1}
+          map={sparkTexture}
+          size={0.35}
           transparent
           vertexColors
           depthWrite={false}
           opacity={0}
           sizeAttenuation
+          blending={AdditiveBlending}
         />
       </points>
     </group>
